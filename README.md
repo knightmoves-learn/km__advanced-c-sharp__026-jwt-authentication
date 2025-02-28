@@ -12,7 +12,7 @@ Prior to you starting this assignment the commands `dotnet remove package AspNet
 You will also find your JWT Authentication configuration pre-filled for you to view in `HomeEnergyApi/secrets.json`
 
 In `HomeEnergyApi/Controllers/AuthenticationController.cs`
-- Create a public class `AuthenticationController` implementing `ControllerBase`
+- Create a public class `AuthenticationController` implementing `ControllerBase` with the attributes `[ApiController]` and `[Route("[controller]")]`
     - Create three private readonly properties `_issuer`, `_audience` and `_secret` of type `string`
     - Create a constructor taking one argument of type `IConfiguration`
         - In the body of the constructor, set `_issuer` `_audience` and `_secret` to the issuer, audience and secret from `secrets.json`
