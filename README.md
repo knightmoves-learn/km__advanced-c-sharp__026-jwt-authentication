@@ -2,7 +2,8 @@
 
 ## Lecture
 
-[![# Jwt Authentication](https://img.youtube.com/vi/h8DWSgf2PfM/0.jpg)](https://www.youtube.com/watch?v=h8DWSgf2PfM)
+[![# Jwt Authentication (Part 1)](https://img.youtube.com/vi/98NJzlKtWew/0.jpg)](https://www.youtube.com/watch?v=98NJzlKtWew)
+[![# Jwt Authentication (Part 2)](https://img.youtube.com/vi/9xNA228pPD8/0.jpg)](https://www.youtube.com/watch?v=9xNA228pPD8)
 
 ## Instructions
 
