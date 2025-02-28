@@ -12,7 +12,6 @@ public class ControllersTests
     private readonly WebApplicationFactory<Program> _factory;
     private HomeDto testHomeDto = new();
     private UtilityProviderDto testUtilityProviderDto = new();
-
     public ControllersTests(WebApplicationFactory<Program> factory)
     {
         _factory = factory;
@@ -65,10 +64,37 @@ public class ControllersTests
     }
 
     [Theory, TestPriority(3)]
+    [InlineData("/Authentication/token")]
+    public async Task HomeEnergyApiCanProvideABearerToken(string url)
+    {
+        var client = _factory.CreateClient();
+        HttpRequestMessage sendRequest = new HttpRequestMessage(HttpMethod.Post, url);
+
+        var response = await client.SendAsync(sendRequest);
+        var responseStr = await response.Content.ReadAsStringAsync();
+
+        Assert.True((int)response.StatusCode == 200,
+            $"HomeEnergyApi did not return \"200: Ok\" HTTP Response Code on POST request at {url}; instead received {(int)response.StatusCode}: {response.StatusCode}");
+
+        bool validToken = responseStr.Length == 292 && responseStr.Contains("{\"token\":\"");
+
+        // if (validToken)
+        // {
+        //     jwtBearerToken = responseStr.Trim(new char[] { '{', '}', '"' }).Substring(8);
+        // }
+
+        Assert.True(validToken,
+            $"The provided bearer token was not in a valid format\nReceived token : {responseStr}");
+    }
+
+    [Theory, TestPriority(4)]
     [InlineData("/admin/Homes")]
     public async Task HomeEnergyApiCanPOSTAHomeGivenAValidHomeDto(string url)
     {
+        string jwtBearerToken = await GetBearerToken();
+
         var client = _factory.CreateClient();
+        client.DefaultRequestHeaders.Add("Authorization", "Bearer " + jwtBearerToken);
 
         HomeDto postTestHomeDto = testHomeDto;
         postTestHomeDto.OwnerLastName = "Test";
@@ -77,9 +103,8 @@ public class ControllersTests
         postTestHomeDto.MonthlyElectricUsage = 123;
 
         string strPostTestHomeDto = JsonSerializer.Serialize(postTestHomeDto);
-
         HttpRequestMessage sendRequest = new HttpRequestMessage(HttpMethod.Post, url);
-        sendRequest.Headers.Authorization =  new AuthenticationHeaderValue("Basic", BuildBase64EncodedAuthString("username","password"));
+
         sendRequest.Content = new StringContent(strPostTestHomeDto,
                                                 Encoding.UTF8,
                                                 "application/json");
@@ -110,7 +135,7 @@ public class ControllersTests
             $"For the Home created on POST at {url}, the home's id did not match the id within the Home Utility Providers property\nExpected Home Id: {expectedHomeId}\nHome Received:{responseContent}");
     }
 
-    [Theory, TestPriority(4)]
+    [Theory, TestPriority(5)]
     [InlineData("/admin/Homes")]
     public async Task HomeEnergyApiCanPUTAHomeGivenAValidHomeDto(string url)
     {
@@ -155,7 +180,7 @@ public class ControllersTests
             $"Home Energy Api did not return the correct Home being updated on PUT at {url}\nHomeDto Sent: {strPutTestHomeDto}\nHome Received:{responseContent}");
     }
 
-    [Theory, TestPriority(5)]
+    [Theory, TestPriority(6)]
     [InlineData("/Homes/Bang")]
     public async Task HomeEnergyApiAppliesGlobalExceptionFilter(string url)
     {
@@ -178,5 +203,16 @@ public class ControllersTests
         var base64EncodedAuthenticationString = Convert.ToBase64String(System.Text.ASCIIEncoding.ASCII.GetBytes(authenticationString));
 
         return base64EncodedAuthenticationString;
+    }
+
+    public async Task<string> GetBearerToken()
+    {
+        var client = _factory.CreateClient();
+        HttpRequestMessage sendRequest = new HttpRequestMessage(HttpMethod.Post, "/Authentication/token");
+
+        var response = await client.SendAsync(sendRequest);
+        var responseStr = await response.Content.ReadAsStringAsync();
+
+        return responseStr.Trim(new char[] { '{', '}', '"' }).Substring(8);
     }
 }

@@ -1,57 +1,57 @@
-# 025 Basic Authentication
+# 025 JWT Authentication
 
 ## Lecture
 
-[![# Basic Authentication (Part 2)](https://img.youtube.com/vi/h8DWSgf2PfM/0.jpg)](https://www.youtube.com/watch?v=h8DWSgf2PfM)
-[![# Basic Authentication (Part 1)](https://img.youtube.com/vi/h8DWSgf2PfM/0.jpg)](https://www.youtube.com/watch?v=h8DWSgf2PfM)
+[![# Jwt Authentication](https://img.youtube.com/vi/h8DWSgf2PfM/0.jpg)](https://www.youtube.com/watch?v=h8DWSgf2PfM)
 
 ## Instructions
 
-In `HomeEnergyApi/secrets.json`
-- Add a `BasicAuth` property
-    - The value should be an object with a `Username` property with a value of `username` and a `Password` property with a value of `password`
+Prior to you starting this assignment the commands `dotnet remove package AspNetCore.Authentication.Basic` and `dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer --version 8.0.0` have been run, you do NOT need to run these yourself
 
-In order to autograde your code challenge, you will NOT add your `secrets.json` file to the `.gitignore`. This is something you would want to do at this step otherwise.
+You will also find your JWT Authentication configuration pre-filled for you to view in `HomeEnergyApi/secrets.json`
+
+In `HomeEnergyApi/Controllers/AuthenticationController.cs`
+- Create a public class `AuthenticationController` implementing `ControllerBase`
+    - Create three private readonly properties `_issuer`, `_audience` and `_secret` of type `string`
+    - Create a constructor taking one argument of type `IConfiguration`
+        - In the body of the constructor, set `_issuer` `_audience` and `_secret` to the issuer, audience and secret from `secrets.json`
+    - Create a `Token()` method, returning an `IActionResult` and designate it as a HTTP POST route at `/Authentication/token` with the attribute `[HttpPost("token")]`
+        - `Token()` should set a `string` variable to the result of `GenerateJwtToken()` (which we will define later)
+        - `Token()` should return `Ok()` with the result of `GenerateJwtToken()` supplied as an argument inside of an anonymous object
+    - Create a `GenerateJwt()` method with a return type of `string`
+        - `GenerateJwt()` should create a variable holding a new `SymmetricSecurityKey` with the `byte[]` value of `_secret` passed into its constructor
+        - `GenerateJwt()` should create a variable holding a new `SigningCredentials` with the newly created `SymmentricSecurityKey` and `SecurityAlgorithms.HmacSha256` passed into its constructor 
+        - `GenerateJwt()` should create a new array holding two `Claim` objects
+            - The first `Claim` should have `JwtRegisteredClaimNames.Sub` and `"maria@knightmove.com"` passed into its constructor
+            - The second `Claim` should have `JwtRegisteredClaimNames.Jti` and a new `Guid` as type `string` passed into its constructor
+        - `GenerateJwt()` should create a variable holding a new `JwtSecurityToken` witth the following passed into its constructor...
+            - `_issuer` as "issuer"
+            - `_audience` as "audience"
+            - The the variable holding the `Claim` array you created as "claims"
+            - An hour from the current time as "expires" (An hour from when the code runs, not the time you are writing this)
+            - The variable holding the `SigningCrendentials` you created as "signingCredentials"
+        - `GenerateJwt()` should return `new JwtSecurityTokenHandler().WriteToken()` with the variable holding the `JwtSecurityToken` you created passed into `WriteToken()`
+
+In `HomeEnergyApi/Authorization/JwtAuthenticationHandler.cs` (Note: This file has been renamed for you)
+- Rename the class `BasicAuthenticationHandler` to `JwtAuthenticationHandler`
+- Remove the existing properties and create three private readonly properties `_issuer`, `_audience` and `_secret` of type `string`
+- Replace the body of the constructor with code that sets `_issuer`, `_audience` and `_secret` to the value of Jwt.Issuer, Jwt.Audience, and Jwt.Secret in `secrets.json`
+- Replace the body of the try block...
+    - Create a variable holding the authorization token value by accessing `Request.Headers["Authorization"]` as a `string`, calling `String.Split()` with `" "` (empty space) passed, and accessing the last element of the resulting array
+    - Create a variable holding a new `JwtSecurityTokenHandler`
+    - Create a variable holding the `byte []` value of `_secret`
+    - Create a variable holding a new `TokenValidationParmeters` with...
+        - `true` as "ValidateIssuer", "ValidateAudience" and "ValidateIssuerSigningKey"
+        - `_issuer` as "ValidIssuer`
+        - `_audience` as "ValidAudience`
+        - A new `SymmetricSecurityKey` with the variable holding the `byte []` value of `_secret` passed into its constructor
+    - Create a variable holding the result of `tokenHandler.ValidateToken()` with the variable holding the authorization token, the variable holding the `TokenValidationParameters`, and `out var validatedToken`
+    - Create a variable holding a new `AuthenticationTicket` with the result of `tokenHandler.ValidateToken()` and `Scheme.Name` passed into its constructor
+    - Return `AuthenticateResult.Success(ticket)` with your `AuthenticationTicket` passed into `.Success()`
 
 In `HomeEnergyApi/Program.cs`
-- Call `builder.Configuration.AddJsonFile()` and pass to it the argument `secrets.json`
-
-In `HomeEnergyApi/Authorization/BasicAuthenticationHandler.cs`
-- Create a new public class `BasicAuthenticationHandler` implementing `AuthenticationHandler<AuthenticationSchemeOptions>`
-    - Create two private readonly properties `_username` and `_password` of type `string`
-    - Create a constructor with an argument for each of the following types...
-        - `IOptionsMonitor<AuthenticationSchemeOptions>`
-        - `ILoggerFactory`
-        - `UrlEncoder`
-        - `ISystemClock`
-        - `IConfiguration`
-    - Add `: base(options, logger, encoder, clock)` after the constructor's argument list to designate the parent class constructor to be used
-    - In the body of the constructor, set `_username` and `_password` to the `Username` and `Password` from `secrets.json` using the `IConfiguration` argument
-    - Create a protected override async method `HandleAuthenticateAsync()`
-        - `HandleAuthenticateAsync()` should return a `Task<AuthenticateResult>`
-        - `HandleAuthenticateAsync()` should return `AuthenticateResult.Fail("Missing Authorization header")` if the request headers do NOT contain an `Authorization` key
-        - Within a try block..
-            - Set a variable to the authorization header using `AuthenticationHeaderValue.Parse(Request.Headers["Authorization"])`
-            - Set a variable to the byte value of the authorization header by using `Convert.FromBase64String` on it's `Paramter` property
-            - Set a variable to an array containing both authorization string values by converting the byte value of the authorization header with `Encoding.UTF8.GetString()` and using `String.Split()` to split that value on the `:` character
-            - Set a variable to the first value in the resulting array to get the username, and the second value to get the password
-            - If the username and password variables you retrieved match the `_username` and `_password` properties...
-                - Create a variable holding an array holding a new `Claim` passing `ClaimTypes.Name` and the retrieved username into its constructor
-                - Create a variable holding a new `ClaimsIdentity` passing your new claims array and `Scheme.Name` into its constructor
-                - Create a variable holding a new `ClaimsPrinciple` passing the newly created `ClaimsIdentity` into its constructor
-                - Create a variable holding a new `AuthenticationTicket` passing the newly created `ClaimsPrinciple` and `Scheme.Name` into its constructor
-                - Return `AuthenticateResult.Success()` with your `AuthenticationTicket` passed into `.Success()`
-            - If the username and password variables you retrieved do NOT match the `_username` and `_password` properties, return `AuthenticateResult.Fail("Invalid username or password")`
-        - Within your catch block return `AuthenticateResult.Fail("Invalid username or password")`
-
-In `HomeEnergyApi/Program.cs`
-- Call `builder.Services.AddAuthentication("BasicAuthentication")`
-    - On this, call `.AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null)`
-- Call `builder.Services.AddAuthorization()`
-- Call `UseAuthentication()` and `UseAuthorization` on the `app`
-
-In `HomeEnergyApi/Controllers/HomeAdminController.cs`
-- Add the `[Authorize]` tag to the `CreatHome()` method
+- Replace the refrence to `BasicAuthenticationHandler` with `JwtAuthenticationHandler`
+- Replace any instance of `"BasicAuthenticationHandler"` with `JwtAuthenticationHandler`
 
 ## Additional Information
 - Do not remove or modify anything in `HomeEnergyApi.Tests`

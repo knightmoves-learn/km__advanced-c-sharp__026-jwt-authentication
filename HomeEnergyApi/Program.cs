@@ -42,8 +42,9 @@ builder.Services.AddAutoMapper(typeof(HomeProfile));
 
 builder.Configuration.AddJsonFile("secrets.json");
         
-builder.Services.AddAuthentication("BasicAuthentication")
-    .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null);
+builder.Services.AddAuthentication("JwtAuthentication")
+    .AddScheme<AuthenticationSchemeOptions, JwtAuthenticationHandler>("JwtAuthentication", null);
+
 
 builder.Services.AddAuthorization();
 
