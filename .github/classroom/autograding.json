@@ -1,0 +1,14 @@
+{
+  "tests": [
+    {
+      "name": "xunit tests",
+      "setup": "",
+      "run": "DOTNET_CLI_HOME=/home/runner dotnet test ./HomeEnergyApi.Tests",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 10,
+      "points": null
+    }
+  ]
+}

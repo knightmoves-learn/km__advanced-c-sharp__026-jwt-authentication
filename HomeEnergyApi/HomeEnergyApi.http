@@ -1,0 +1,6 @@
+@HomeEnergyApi_HostAddress = http://localhost:5197
+
+GET {{HomeEnergyApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -1,0 +1,12 @@
+{
+  "name": "C# (.NET)",
+  "features": {
+    "ghcr.io/devcontainers/features/dotnet:1": {}
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": ["ms-dotnettools.csharp", "GanesanChandran.fetch-client"]
+    }
+  }
+}

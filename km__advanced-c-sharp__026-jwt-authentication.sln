@@ -1,0 +1,30 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomeEnergyApi", "HomeEnergyApi\HomeEnergyApi.csproj", "{D1F7A44D-1ABA-AF95-C529-564723B462B3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomeEnergyApi.Tests", "HomeEnergyApi.Tests\HomeEnergyApi.Tests.csproj", "{629FCCA7-FE01-D265-D957-440781CEE503}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D1F7A44D-1ABA-AF95-C529-564723B462B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1F7A44D-1ABA-AF95-C529-564723B462B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1F7A44D-1ABA-AF95-C529-564723B462B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1F7A44D-1ABA-AF95-C529-564723B462B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{629FCCA7-FE01-D265-D957-440781CEE503}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{629FCCA7-FE01-D265-D957-440781CEE503}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{629FCCA7-FE01-D265-D957-440781CEE503}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{629FCCA7-FE01-D265-D957-440781CEE503}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {228ECC93-BBE1-4F04-A69B-1D2F5E5B6DF5}
+	EndGlobalSection
+EndGlobal
