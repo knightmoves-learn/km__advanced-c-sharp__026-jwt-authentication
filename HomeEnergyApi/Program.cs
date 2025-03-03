@@ -43,7 +43,7 @@ builder.Services.AddAutoMapper(typeof(HomeProfile));
 builder.Configuration.AddJsonFile("secrets.json");
         
 builder.Services.AddAuthentication("JwtAuthentication")
-    .AddScheme<AuthenticationSchemeOptions, JwtAuthenticationHandler>("JwtAuthentication", null);
+    .AddScheme<AuthenticationSchemeOptions, JwtAuthenticationHandler>("JwtAuthentication", options => {});
 
 
 builder.Services.AddAuthorization();
