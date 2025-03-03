@@ -35,7 +35,7 @@ namespace Authentication
             
             var claims = new[]
             {
-                new Claim(JwtRegisteredClaimNames.Sub, "maria@knightmoves.com"),
+                new Claim(JwtRegisteredClaimNames.Sub, "maria@knightmoves.org"),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
