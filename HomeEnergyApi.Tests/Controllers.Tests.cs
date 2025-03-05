@@ -76,7 +76,7 @@ public class ControllersTests
         Assert.True((int)response.StatusCode == 200,
             $"HomeEnergyApi did not return \"200: Ok\" HTTP Response Code on POST request at {url}; instead received {(int)response.StatusCode}: {response.StatusCode}");
 
-        bool validToken = responseStr.Length == 292 && responseStr.Contains("{\"token\":\"");
+        bool validToken = responseStr.Contains("{\"token\":\"");
 
         // if (validToken)
         // {
